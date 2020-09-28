@@ -1,10 +1,14 @@
 let prevInput = '0'
 let calculationOperator = ''
 let currentInput = '0'
+let prevOperator = '';
+let update = true;
 
 const inputNumber = (number) => {
-  if (currentInput === '0') {
+  if (currentInput === '0' || update) {
+    prevInput = currentInput
     currentInput = number
+    update = false;
   } else {
     currentInput += number
   }
@@ -14,8 +18,9 @@ const inputOperator = (operator) => {
   if (calculationOperator === '') {
     prevInput = currentInput
   }
+  prevOperator = calculationOperator;
   calculationOperator = operator
-  currentInput = '0'
+  update = true;
 }
 
 const inputDecimal = (dot) => {
@@ -29,9 +34,9 @@ const getPercentage = () => {
   currentInput = currentInput / 100
 }
 
-const calculate = () => {
+const calculate = (operator) => {
   let result = 0
-  switch(calculationOperator) {
+  switch(operator) {
     case '+':
       result = parseFloat(prevInput) + parseFloat(currentInput)
       break
@@ -48,8 +53,7 @@ const calculate = () => {
       return
   }
   currentInput = result.toString()
-  calculationOperator = ''
-  prevInput = '0'
+  updateScreen(currentInput);
 }
 
 const clearAll = () => {
@@ -77,13 +81,16 @@ const operators = document.querySelectorAll(".operator")
 operators.forEach((operator) => {
   operator.addEventListener("click", (event) => {
     inputOperator(event.target.value)
+    if (prevInput !== '0') {
+      calculate(prevOperator);
+    }
   })
 })
 
 const equalSign = document.querySelector('.equal-sign')
 
 equalSign.addEventListener("click", () => {
-  calculate()
+  calculate(calculationOperator)
   updateScreen(currentInput)
 })
 
